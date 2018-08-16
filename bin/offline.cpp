@@ -87,10 +87,10 @@ int main(int argc, char *argv[]) {
         
         int retCode = 0;
         std::cout << "Start Merge" << std::endl;
-        inputSource.mergeOfflineRegions(*mergePath,  [&] (std::exception_ptr error, optional<std::vector<OfflineRegion>> result) {
+        inputSource.mergeOfflineRegions(*mergePath,  [&] (mbgl::expected<std::vector<OfflineRegion>, std::exception_ptr> result) {
 
-            if (error) {
-                std::cerr << "Error merging database: " << util::toString(error) << std::endl;
+            if (!result) {
+                std::cerr << "Error merging database: " << util::toString(result.error()) << std::endl;
                 retCode = 1;
             } else {
                 std::cout << " Added " << result->size() << " Regions" << std::endl;
@@ -139,16 +139,7 @@ int main(int argc, char *argv[]) {
 
             if (status.complete()) {
                 std::cout << "Finished Download" << std::endl;
-                if (mergePath) {
-                    std::cout << "Start Merge" << std::endl;
-                    fileSource.mergeOfflineRegions(*mergePath,  [&] (std::exception_ptr, optional<std::vector<OfflineRegion>> ) {
-                        std::cout << "Finished Merge" << std::endl;
-                        loop.stop();
-                    });
-                
-                } else {
-                    loop.stop();
-                }
+                loop.stop();
             }
         }
 

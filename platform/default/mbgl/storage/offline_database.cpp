@@ -638,7 +638,8 @@ OfflineDatabase::createRegion(const OfflineRegionDefinition& definition,
     return unexpected<std::exception_ptr>(std::current_exception());
 }
 
-std::vector<OfflineRegion> OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
+expected<std::vector<OfflineRegion>, std::exception_ptr>
+OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
     try {
         // clang-format off
         mapbox::sqlite::Query query{ getStatement("ATTACH DATABASE ?1 AS side") };
@@ -647,8 +648,8 @@ std::vector<OfflineRegion> OfflineDatabase::mergeDatabase(const std::string& sid
         query.bind(1, sideDatabasePath);
         query.run();
     } catch (const mapbox::sqlite::Exception& ex) {
-        Log::Error(Event::Database, "Unexpected error attaching database: %s", ex.what());
-        throw ex;
+        handleError(ex, "merge databse attach");
+        return unexpected<std::exception_ptr>(std::current_exception());
     }
     try {
         // Attaching an accessible path without a db file creates a new temporary
@@ -680,9 +681,9 @@ std::vector<OfflineRegion> OfflineDatabase::mergeDatabase(const std::string& sid
         db->exec("DETACH DATABASE side");
         return result;
     } catch (const mapbox::sqlite::Exception& ex) {
-        Log::Error(Event::Database, "Unexpected error merging side database: %s", ex.what());
         db->exec("DETACH DATABASE side");
-        throw ex;
+        handleError(ex, "merge databse post merge sql");
+        return unexpected<std::exception_ptr>(std::current_exception());
     }
     return {};
 }
