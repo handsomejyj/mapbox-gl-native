@@ -638,13 +638,13 @@ OfflineDatabase::createRegion(const OfflineRegionDefinition& definition,
     return unexpected<std::exception_ptr>(std::current_exception());
 }
 
-optional<std::vector<OfflineRegion>> OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
+std::vector<OfflineRegion> OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
     try {
         // clang-format off
         mapbox::sqlite::Query query{ getStatement("ATTACH DATABASE ?1 AS side") };
         // clang-format on
 
-        query.bind(1, sideDatabasePath.c_str());
+        query.bind(1, sideDatabasePath);
         query.run();
     } catch (const mapbox::sqlite::Exception& ex) {
         Log::Error(Event::Database, "Unexpected error attaching database: %s", ex.what());
