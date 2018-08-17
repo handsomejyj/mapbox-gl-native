@@ -114,7 +114,7 @@ public:
      * region definition.
      */
     void mergeOfflineRegions(const std::string& sideDatabasePath,
-                            std::function<void (expected<std::vector<OfflineRegion>, std::exception_ptr>)>);
+                            std::function<void (expected<OfflineRegions, std::exception_ptr>)>);
 
     /*
      * Remove an offline region from the database and perform any resources evictions

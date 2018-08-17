@@ -638,7 +638,7 @@ OfflineDatabase::createRegion(const OfflineRegionDefinition& definition,
     return unexpected<std::exception_ptr>(std::current_exception());
 }
 
-expected<std::vector<OfflineRegion>, std::exception_ptr>
+expected<OfflineRegions, std::exception_ptr>
 OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
     try {
         // clang-format off
@@ -671,15 +671,17 @@ OfflineDatabase::mergeDatabase(const std::string& sideDatabasePath) {
             "JOIN regions r ON sr.definition = r.definition") };
         // clang-format on
 
-        std::vector<OfflineRegion> result;
+        OfflineRegions result;
         while (query.run()) {
-            result.push_back(OfflineRegion(
-                query.get<int64_t>(0),
+            // Construct, then move because this constructor is private.
+            OfflineRegion region(query.get<int64_t>(0),
                 decodeOfflineRegionDefinition(query.get<std::string>(1)),
-                query.get<std::vector<uint8_t>>(2)));
+                query.get<std::vector<uint8_t>>(2));
+            result.emplace_back(std::move(region));
         }
         db->exec("DETACH DATABASE side");
-        return result;
+        // Explicit move to avoid triggering the copy constructor.
+        return { std::move(result) };
     } catch (const mapbox::sqlite::Exception& ex) {
         db->exec("DETACH DATABASE side");
         handleError(ex, "merge databse post merge sql");
