@@ -14,18 +14,6 @@
 - (instancetype)initWithShapes:(NSArray<MGLShape *> *)shapes {
     if (self = [super init]) {
         _shapes = shapes.copy;
-        
-        for (MGLShape* shape in shapes ){
-            if ([shape conformsToProtocol:@protocol(MGLFeature)]) {
-                static dispatch_once_t onceToken;
-                dispatch_once(&onceToken, ^{
-                    NSLog(@"Shape collection will not retain attributes from objects conforming to MGLFeature protocol."
-                          @"Use MGLShapeCollectionFeature instead."
-                          @"This will be logged only once.");
-                });
-            }
-            break;
-        }
     }
     return self;
 }
