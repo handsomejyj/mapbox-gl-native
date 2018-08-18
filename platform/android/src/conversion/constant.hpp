@@ -14,34 +14,13 @@ namespace android {
 namespace conversion {
 
 template <>
-struct Converter<jni::jobject*, bool> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const bool& value) const;
-};
-
-template <>
-struct Converter<jni::jboolean, bool> {
-    Result<jni::jboolean> operator()(jni::JNIEnv&, const bool& value) const;
-};
-
-template <>
 struct Converter<jni::jobject*, float> {
     Result<jni::jobject*> operator()(jni::JNIEnv& env, const float& value) const;
 };
 
 template <>
-struct Converter<jni::jfloat, float> {
-    Result<jni::jfloat> operator()(jni::JNIEnv&, const float& value) const;
-};
-
-
-template <>
 struct Converter<jni::jobject*, double> {
     Result<jni::jobject*> operator()(jni::JNIEnv& env, const double& value) const;
-};
-
-template <>
-struct Converter<jni::jdouble, float> {
-    Result<jni::jdouble> operator()(jni::JNIEnv&, const double& value) const;
 };
 
 /**
@@ -62,11 +41,6 @@ struct Converter<jni::jobject*, T, typename std::enable_if<std::is_integral<T>::
 template <>
 struct Converter<jni::jobject*, std::string> {
     Result<jni::jobject*> operator()(jni::JNIEnv& env, const std::string& value) const;
-};
-
-template <>
-struct Converter<jni::jstring*, std::string> {
-    Result<jni::jstring*> operator()(jni::JNIEnv& env, const std::string& value) const;
 };
 
 template <>
